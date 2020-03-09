@@ -60,7 +60,7 @@ class Api extends RestController {
             $this->response(var_dump($schedule), 200);
         }
         else {
-            $this->response("Such A Data Doesn't Exist", RestController::HTTP_BAD_REQUEST);
+            $this->response("Such Data Doesn't Exist", RestController::HTTP_BAD_REQUEST);
         }
 
     }
