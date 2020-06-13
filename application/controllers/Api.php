@@ -28,7 +28,7 @@ class Api extends RestController {
 
                 $this->response([
                     'status' => TRUE,
-                    'message' => 'User Login Successful',
+                    'message' => 'User Login Successfull',
                     'data' => $user 
                 ], RestController::HTTP_OK);
             }
