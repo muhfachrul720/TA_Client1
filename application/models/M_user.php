@@ -12,7 +12,12 @@ class M_user extends CI_Model {
 
     public function check_user($where)
     {   
-        return $this->db->get_where($this->table_name, $where);
+        $this->db->select('us.id, us.email, pr.id, pr.parent_name, pr.parent_phone, pr.parent_address');
+        $this->db->from("$this->table_name as us");
+        $this->db->join('table_parent as pr', 'us.parent_id = pr.id');
+        $this->db->where($where);
+        return $this->db->get();
+        // return $this->db->get_where($this->table_name, $where);
     }
 
     public function total_row()
@@ -22,14 +27,17 @@ class M_user extends CI_Model {
     }
 
     public function get_data($number, $offset, $like = null)
-    {
+    {   
+        $this->db->select('us.id, us.email, pr.id, pr.parent_name, pr.parent_phone, pr.parent_address');
+        $this->db->from("$this->table_name as us");
+        $this->db->join('table_parent as pr', 'us.parent_id = pr.id');
         if($like != null) {
-            $this->db->like('name', $like);
+            $this->db->like('pr.parent_name', $like);
             $this->db->or_like('email', $like);
         }
         $this->db->limit($number, $offset);
-        $this->db->order_by('id', 'DESC');
-        return $this->db->get($this->table_name);
+        $this->db->order_by('us.id', 'DESC');
+        return $this->db->get();
     }
 
     public function insert_new($data)
@@ -45,6 +53,16 @@ class M_user extends CI_Model {
 
     public function get_edit($from)
     {
+        $this->db->select('us.id, us.email, pr.id as pid, pr.parent_name, pr.parent_phone, pr.parent_address');
+        $this->db->from("$this->table_name as us");
+        $this->db->join('table_parent as pr', 'us.parent_id = pr.id');
+        $this->db->where('us.id', $from);
+        return $this->db->get();
+    }
+
+    public function get_parentid($from)
+    {
+        $this->db->select('parent_id');
         $this->db->where('id', $from);
         return $this->db->get($this->table_name);
     }

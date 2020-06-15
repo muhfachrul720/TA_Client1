@@ -19,8 +19,8 @@
         <a href="<?= base_url()?>schedule" class="sign-out"><i class="fa fa-arrow-left"></i></a>
         <div class="row" style="margin:30px">
             <div class="col-lg-12" style="text-align:center;">
-                <h4>Data Daftar Pengguna</h3>
-                <p>Dashboard Untuk Mengelola Data Pengguna</p>
+                <h4>Data Daftar Pengajar</h3>
+                <p>Dashboard Untuk Mengelola Data Pengajar</p>
             </div>
             <?php if($this->session->flashdata('Alert') != null) {?>
             <div class="col-lg-12" style="text-align:center;">
@@ -31,7 +31,7 @@
             <div class="col-lg-12 mt-3">
                 <div class="row">
                     <div class="col-sm-9">
-                        <button type="button" data-toggle="modal" data-target="#addModal" class='btn btn-sm btn-primary'>Tambah User</button>
+                        <button type="button" data-toggle="modal" data-target="#addModal" class='btn btn-sm btn-primary'>Tambah Pengajar</button>
                     </div>
                     <div class="col-sm-2 p-0">
                         <input type="text" name="search" class="form-control form-control-sm">
@@ -47,9 +47,8 @@
                     <thead>
                         <tr>
                             <th scope="col">No</th>
-                            <th scope="col">Nama Pengguna</th>
-                            <th scope="col">Email Pengguna</th>
-                            <th scope="col">Nomor HP</th>
+                            <th scope="col">Nama Pengajar</th>
+                            <th scope="col">Nomor Telefon</th>
                             <th scope="col">Alamat</th>
                             <th scope="col">Opsi</th>
                         </tr>
@@ -60,12 +59,11 @@
                             foreach($result as $s) {?>
                         <tr>
                             <td><?= $no++?></td>
-                            <td><?= $s->parent_name?></td>
-                            <td><?= $s->email?></td>
-                            <td><?= $s->parent_phone?></td>
-                            <td><?= $s->parent_address?></td>
+                            <td><?= $s->teacher_name?></td>
+                            <td><?= $s->teacher_phone?></td>
+                            <td><?= $s->teacher_address?></td>
                             <td>
-                                <form action="<?=base_url()?>user/delete_user" method="post">
+                                <form action="<?=base_url()?>teacher/delete_teacher" method="post">
                                     <input type="hidden" name="id" value="<?= $s->id?>">
                                     <button type="button" data-toggle="modal" data-target="#editModal" class="btn btn-sm btn-primary toggleEdit" value="<?= $s->id?>">Edit</button>
                                     <input type="submit" class="btn btn-sm btn-danger" value="Hapus">
@@ -87,13 +85,13 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Tambah Jadwal</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Tambah Tenaga Pengajar</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= base_url()?>user/add_user" method="post">
+                <form action="<?= base_url()?>teacher/add_teacher" method="post">
                 <div class="row form-group">
                         <div class="col-lg-4 py-1">Nama : </div>
                         <div class="col-lg-8">
@@ -101,13 +99,7 @@
                         </div>
                 </div>
                 <div class="row form-group">
-                        <div class="col-lg-4 py-1">Email : </div>
-                        <div class="col-lg-8">
-                            <input type="email" name="email" class="form-control form-control-sm" required>
-                        </div>
-                </div>
-                <div class="row form-group">
-                        <div class="col-lg-4 py-1">No HP : </div>
+                        <div class="col-lg-4 py-1">No Telefon : </div>
                         <div class="col-lg-8">
                             <input type="text" name="phone" class="form-control form-control-sm" required>
                         </div>
@@ -143,35 +135,26 @@
                    var id = $(this).val();
                    $.ajax({
                         type: "POST", 
-                        url: '<?= base_url()?>user/get_dataEdit',
+                        url: '<?= base_url()?>teacher/get_dataEdit',
                         data: {id:id},
                         dataType : 'JSON',
                         success: function(response){
                             $('#iptID').val(id);
                             $('#iptName').val(response['name']);
-                            $('#iptEmail').val(response['email']);
                             $('#iptPhone').val(response['phone']);
                             $('#iptAddress').val(response['address']);
-                            $('#iptPID').val(response['p_id']);
                         }  
                    });
                 });
             </script>
             <div class="modal-body">
                 <?php echo validation_errors(); ?>
-                <form action="<?= base_url()?>user/edit_user" method="post">
+                <form action="<?= base_url()?>teacher/edit_teacher" method="post">
                 <input type="hidden" name="id" id="iptID" value="">
-                <input type="hidden" name="pid" id="iptPID" value="">
                 <div class="row form-group">
                         <div class="col-lg-4 py-1">Nama : </div>
                         <div class="col-lg-8">
                             <input type="text" id="iptName" name="name" class="form-control form-control-sm" value="" required>
-                        </div>
-                </div>
-                <div class="row form-group">
-                        <div class="col-lg-4 py-1">Email : </div>
-                        <div class="col-lg-8">
-                            <input type="text" id="iptEmail" name="email" class="form-control form-control-sm" required>
                         </div>
                 </div>
                 <div class="row form-group">

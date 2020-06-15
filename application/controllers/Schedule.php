@@ -17,18 +17,33 @@ class Schedule extends MY_Controller {
 
         $data['schedule'] = $this->m_schedule->get_schedule(10, $from, $this->input->post('search'))->result();
 
+        $data['teacher'] = $this->m_schedule->get_teacher_info()->result();
+        $data['user'] = $this->m_schedule->get_userinfo()->result();
+
         $this->load->view('parts/header');
         $this->load->view('dashboard', $data);
+    }
+
+    public function get_phoneNumber()
+    {
+        $post = $this->input->post();
+        if($result = $this->m_schedule->get_parentNumber($post['id'])->result()){
+
+            foreach ($result as $res){
+                $dataid = array(
+                    'phone' => $res->parent_phone,
+                );
+            }
+            
+            echo json_encode($dataid);
+        }
     }
 
     public function add_schedule()
     {
         $post = $this->input->post();
 
-        $this->form_validation->set_rules('id', 'ID', 'required');
         $this->form_validation->set_rules('childname', 'Nama Anak', 'required');
-        $this->form_validation->set_rules('teachername', 'Nama Guru', 'required');
-        $this->form_validation->set_rules('parentname', 'Nama Ortu', 'required');
         $this->form_validation->set_rules('phonenumber', 'No HP', 'required');
         $this->form_validation->set_rules('date', 'Hari Dan Jam', 'required');
         $this->form_validation->set_rules('time', 'Hari Dan Jam', 'required');
@@ -39,10 +54,9 @@ class Schedule extends MY_Controller {
         }
         else {
             $data = array(
-                'keygen' => $post['id'],
                 'child_name' => $post['childname'],
-                'teacher_name' => $post['teachername'],
-                'parent_name' => $post['parentname'],
+                'teacher_id' => $post['teachername'],
+                'user_id' => $post['parentname'],
                 'phone_number' => $post['phonenumber'],
                 'date' => $post['date'].' '.$post['time'],
             );
@@ -62,15 +76,15 @@ class Schedule extends MY_Controller {
     {
         $post = $this->input->post();
         if($result = $this->m_schedule->get_edit($post['id'])->result()){
-
             foreach ($result as $res){
                 $x = explode(' ', $res->date);
                 $dataid = array(
-                    'keygen' => $res->keygen,
-                    'childName' => $res->child_name,
-                    'teacherName' => $res->teacher_name,
-                    'parentName' => $res->parent_name,
-                    'phoneNumber' => $res->phone_number,
+                    'child' => $res->child,
+                    'TName' => $res->teacher,
+                    'Tid' => $res->tid,
+                    'Pid' => $res->pid,
+                    'PName' => $res->parent,
+                    'phone' => $res->phone,
                     'date' => $x[0],
                     'time' => $x[1]
                 );
@@ -84,10 +98,7 @@ class Schedule extends MY_Controller {
     {
         $post = $this->input->post();
 
-        $this->form_validation->set_rules('id', 'ID', 'required');
         $this->form_validation->set_rules('childname', 'Nama Anak', 'required');
-        $this->form_validation->set_rules('teachername', 'Nama Guru', 'required');
-        $this->form_validation->set_rules('parentname', 'Nama Ortu', 'required');
         $this->form_validation->set_rules('phonenumber', 'No HP', 'required');
         $this->form_validation->set_rules('date', 'Hari Dan Jam', 'required');
         $this->form_validation->set_rules('time', 'Hari Dan Jam', 'required');
@@ -98,10 +109,9 @@ class Schedule extends MY_Controller {
         }
         else {
             $data = array(
-                'keygen' => $post['id'],
                 'child_name' => $post['childname'],
-                'teacher_name' => $post['teachername'],
-                'parent_name' => $post['parentname'],
+                'teacher_id' => $post['teachername'],
+                'user_id' => $post['parentname'],
                 'phone_number' => $post['phonenumber'],
                 'date' => $post['date'].' '.$post['time'],
             );

@@ -52,12 +52,11 @@ class Api extends RestController {
         $limit = $this->get('limit');
         $start = $this->get('start');
         $key =   $this->get('key`');
-        $order = $this->get('order');
         $where = $this->get('id');
 
         if(!empty($where)){
             $schedule = $this->m_api->get_schedulebyId($where, $limit, $start, $key)->result();
-            $this->response(var_dump($schedule), 200);
+            $this->response($schedule, 200);
         }
         else {
             $this->response("Such Data Doesn't Exist", RestController::HTTP_BAD_REQUEST);

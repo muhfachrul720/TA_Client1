@@ -32,6 +32,7 @@
                 <div class="row">
                     <div class="col-sm-9">
                         <button type="button" data-toggle="modal" data-target="#addModal" class='btn btn-sm btn-primary'>Tambah Jadwal</button>
+                        <a href="<?=base_url()?>teacher" class='btn btn-sm btn-primary'>Managemen Guru</a>
                         <a href="<?=base_url()?>user" class='btn btn-sm btn-primary'>Managemen User</a>
                         <a href="<?=base_url()?>video" class='btn btn-sm btn-primary'>Video</a>
                     </div>
@@ -63,10 +64,10 @@
                             foreach($schedule as $s) {?>
                         <tr>
                             <td><?= $no++?></td>
-                            <td><?= $s->child_name?></td>
-                            <td><?= $s->teacher_name?></td>
-                            <td><?= $s->parent_name?></td>
-                            <td><?= $s->phone_number?></td>
+                            <td><?= $s->child?></td>
+                            <td><?= $s->teacher?></td>
+                            <td><?= $s->parent?></td>
+                            <td><?= $s->phone?></td>
                             <td><?= $s->date?></td>
                             <td>
                                 <form action="<?=base_url()?>schedule/delete_schedule" method="post">
@@ -99,33 +100,56 @@
             <div class="modal-body">
                 <form action="<?= base_url()?>schedule/add_schedule" method="post">
                 <div class="row form-group">
-                        <div class="col-lg-4 py-1">ID : </div>
-                        <div class="col-lg-8">
-                            <input type="text" name="id" class="form-control form-control-sm" value="" required>
-                        </div>
-                </div>
-                <div class="row form-group">
                         <div class="col-lg-4 py-1">Nama Anak : </div>
                         <div class="col-lg-8">
                             <input type="text" name="childname" class="form-control form-control-sm" required>
                         </div>
                 </div>
                 <div class="row form-group">
-                        <div class="col-lg-4 py-1">Nama Guru : </div>
+                <div class="col-lg-4 py-1">Nama Pengajar : </div>
                         <div class="col-lg-8">
-                            <input type="text" name="teachername" class="form-control form-control-sm" required>
+                                <select class="form-control form-control-sm" name="teachername">
+                                <option value="" selected>Silahkan Pilih Pengajar</option>
+                                <?php
+                                    foreach($teacher as $p){?>
+                                    <option value="<?= $p->id?>"><?= $p->teacher_name?></option>
+                                <?php }; ?>
+                                </select>
+                            <!-- <input type="text" name="parentname" class="form-control form-control-sm" required> -->
                         </div>
                 </div>
                 <div class="row form-group">
                         <div class="col-lg-4 py-1">Nama Orang Tua : </div>
                         <div class="col-lg-8">
-                            <input type="text" name="parentname" class="form-control form-control-sm" required>
+                                <select id="toggleNumber" class="form-control form-control-sm" name="parentname">
+                                <option value="" selected>Silahkan Pilih Orang tua</option>
+                                <?php
+                                    foreach($user as $p){?>
+                                    <option value="<?= $p->uid?>"><?= $p->parent_name?></option>
+                                <?php }; ?>
+                                </select>
+                            <!-- <input type="text" name="parentname" class="form-control form-control-sm" required> -->
                         </div>
                 </div>
+                <script>
+                $('#toggleNumber').on('change', function() {
+                   var id = $(this).children("option:selected").val();
+                   console.log(id);
+                   $.ajax({
+                        type: "POST", 
+                        url: '<?= base_url()?>schedule/get_phoneNumber',
+                        data: {id:id},
+                        dataType : 'JSON',
+                        success: function(response){
+                            $('#iptNumber').val(response['phone']);
+                        }  
+                   });
+                });
+                </script>
                 <div class="row form-group">
                         <div class="col-lg-4 py-1">No Hp : </div>
                         <div class="col-lg-8">
-                            <input type="text" name="phonenumber" class="form-control form-control-sm" required>
+                            <input type="text" name="phonenumber" id="iptNumber" class="form-control form-control-sm" required>
                         </div>
                 </div>
                 <div class="row form-group">
@@ -147,7 +171,7 @@
         </div>
     </div>
 
-     <!-- Modal Edit-->
+    <!-- Modal Edit Rev 1 -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -167,7 +191,113 @@
                         dataType : 'JSON',
                         success: function(response){
                             $('#iptID').val(id);
-                            $('#iptKey').val(response['keygen']);
+                            $('#iptChild').val(response['child']);
+                            $('#iptTeach').html(response['TName']);
+                            $('#iptTeach').val(response['Tid']);
+                            $('#iptParent').html(response['PName']);
+                            $('#iptParent').val(response['Pid']);
+                            $('#iptPhone').val(response['phone']);
+                            $('#iptDate').val(response['date']);
+                            $('#iptTime').val(response['time']);
+                        }
+                   });
+                });
+            </script>
+            <div class="modal-body">
+                <form action="<?= base_url()?>schedule/edit_schedule" method="post">
+                <input type="hidden" name="realid" id="iptID" value="">
+                <div class="row form-group">
+                        <div class="col-lg-4 py-1">Nama Anak : </div>
+                        <div class="col-lg-8">
+                            <input id="iptChild" type="text" name="childname" class="form-control form-control-sm" required>
+                        </div>
+                </div>
+                <div class="row form-group">
+                <div class="col-lg-4 py-1">Nama Pengajar : </div>
+                        <div class="col-lg-8">
+                                <select class="form-control form-control-sm" name="teachername">
+                                <option id="iptTeach" value="" selected></option>
+                                <?php
+                                    foreach($teacher as $p){?>
+                                    <option value="<?= $p->id?>"><?= $p->teacher_name?></option>
+                                <?php }; ?>
+                                </select>
+                            <!-- <input type="text" name="parentname" class="form-control form-control-sm" required> -->
+                        </div>
+                </div>
+                <div class="row form-group">
+                        <div class="col-lg-4 py-1">Nama Orang Tua : </div>
+                        <div class="col-lg-8">
+                                <select id="toggleNumber" class="form-control form-control-sm" name="parentname">
+                                <option id="iptParent" value="" selected>Silahkan Pilih Orang tua</option>
+                                <?php
+                                    foreach($user as $p){?>
+                                    <option value="<?= $p->uid?>"><?= $p->parent_name?></option>
+                                <?php }; ?>
+                                </select>
+                            <!-- <input type="text" name="parentname" class="form-control form-control-sm" required> -->
+                        </div>
+                </div>
+                <script>
+                $('#toggleNumber').on('change', function() {
+                   var id = $(this).children("option:selected").val();
+                   console.log(id);
+                   $.ajax({
+                        type: "POST", 
+                        url: '<?= base_url()?>schedule/get_phoneNumber',
+                        data: {id:id},
+                        dataType : 'JSON',
+                        success: function(response){
+                            $('#iptNumber').val(response['phone']);
+                        }  
+                   });
+                });
+                </script>
+                <div class="row form-group">
+                        <div class="col-lg-4 py-1">No Hp : </div>
+                        <div class="col-lg-8">
+                            <input id="iptPhone" type="text" name="phonenumber" id="iptNumber" class="form-control form-control-sm" required>
+                        </div>
+                </div>
+                <div class="row form-group">
+                        <div class="col-lg-4 py-1">Hari & Jam : </div>
+                        <div class="col-lg-4">
+                            <input id="iptDate" type="date" name="date" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-lg-4">
+                            <input id="iptTime" type="time" name="time" class="form-control form-control-sm" required>
+                        </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <input type="submit" class="btn btn-primary" value="Simpan Perubahan">
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Modal Edit-->
+    <!-- <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Jadwal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <script>
+                $('.toggleEdit').on('click', function() {
+                   var id = $(this).val();
+                   $.ajax({
+                        type: "POST", 
+                        url: '<?= base_url()?>schedule/get_dataEdit',
+                        data: {id:id},
+                        dataType : 'JSON',
+                        success: function(response){
+                            $('#iptID').val(id);
                             $('#iptChild').val(response['childName']);
                             $('#iptTeacher').val(response['teacherName']);
                             $('#iptParent').val(response['parentName']);
@@ -181,12 +311,6 @@
             <div class="modal-body">
                 <form action="<?= base_url()?>schedule/edit_schedule" method="post">
                 <input type="hidden" name="realid" id="iptID" value="">
-                <div class="row form-group">
-                        <div class="col-lg-4 py-1">ID : </div>
-                        <div class="col-lg-8">
-                            <input type="text" id="iptKey" name="id" class="form-control form-control-sm" value="" required readonly>
-                        </div>
-                </div>
                 <div class="row form-group">
                         <div class="col-lg-4 py-1">Nama Anak : </div>
                         <div class="col-lg-8">
@@ -228,7 +352,7 @@
             </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 </body>
 </html>
